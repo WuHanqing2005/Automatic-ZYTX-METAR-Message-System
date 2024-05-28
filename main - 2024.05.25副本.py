@@ -1,6 +1,6 @@
 # -*- coding:utf-8 -*-
 # 软件名称：沈阳桃仙机场METAR报文自动推送程序
-# 版本号：2024.05.28
+# 版本号：2024.05.25
 # 软件版权归属：吴瀚庆
 # 未经允许，禁止盗用，侵权必究
  
@@ -19,13 +19,6 @@ from fake_useragent import UserAgent
 import os
 import random
 import time
-
-from selenium import webdriver
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.by import By
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as EC
-from selenium.common.exceptions import TimeoutException
  
  
 # 初始化界面信息
@@ -38,10 +31,7 @@ datetime_list = []
 uid_list_admin = ['UID_sG9SP4pGXirFnBEeWPrahV3iKBmL']
 
 # 设备信息
-machine_info = '阿里云服务器: i-2zed7url05v911mdbtnk'
-
-# 版本号
-version_code = '2024.05.28'
+machine_info = '吴瀚庆的主机'
  
  
 # 写错误日志的函数
@@ -63,8 +53,6 @@ def write_error_log(error_message):
         file.write(log_message)
     
     
-    import requests
-
      # wxpusher的API接口地址
     api_url = "http://wxpusher.zjiecode.com/api/send/message"
  
@@ -72,8 +60,8 @@ def write_error_log(error_message):
     appToken = "AT_JSUGQyhL9sfnoFcDASFphPGKLCC5VrtG"
     appKey = "62862"
  
-    # 将错误消息转换为字符串，以便它可以被 JSON 序列化
-    content = str(error_message)
+    # 消息内容
+    content = error_message
  
     # 尝试发出网络请求，推送消息
     try:
@@ -81,25 +69,27 @@ def write_error_log(error_message):
             # 构建发送消息的请求参数
             data = {
                 "appToken": appToken,
-                "content": content,  # 使用转换后的字符串
-                "summary": "沈阳桃仙机场METAR报文错误信息",
+                "content": content,
+                "summary": "沈阳桃仙机场METAR报文推送",
                 "contentType": 1,
                 "topicIds": [123],
                 "uids": [
                     uid  # 替换成要发送消息的微信用户的userId
                 ]
             }
-
+ 
             # 发送POST请求
             response = requests.post(api_url, json=data)
-
+ 
             # 打印返回的结果
             # print(response.json())
-    except:
-        print('Send error message failed.')
+            
+    except Exception as error_message:
+        print(f"Send ZYTX_METAR Error messsage failed: {error_message}")
+        write_error_log(error_message)
 
 
-
+ 
  
 # 获取METAR报文原文的函数，不需要任何参数，返回值为一个储存了多条METAR的一维数组，如：
 # ['ZYTX 210830Z 24006MPS CAVOK 27/15 Q1013 NOSIG', 'ZYTX 210800Z 24005MPS 210V270 CAVOK 27/15 Q1013 NOSIG']
@@ -131,20 +121,7 @@ def get_metar_list():
         driver.get(url)
  
         # 等待网页加载（这里使用显式等待或隐式等待可能更精确，但简单起见先使用time.sleep）
-        # time.sleep(5)  # 等待几秒，这个时间可能需要调整
-        
-        # 使用显式等待等待页面加载完成
-        try:
-            # 等待页面中的某个特定元素加载，例如等待页面标题
-            WebDriverWait(driver, 10).until(
-                EC.presence_of_element_located((By.CSS_SELECTOR, "body"))  # 根据实际情况调整选择器
-            )
-        except TimeoutException:
-            print("页面加载超时")
-            driver.quit()
-            return  # 退出函数
-
-
+        time.sleep(3)  # 等待几秒，这个时间可能需要调整
  
         # 使用BeautifulSoup解析网页内容
         soup = BeautifulSoup(driver.page_source, 'html.parser')
@@ -174,13 +151,7 @@ def get_metar_list():
     except Exception as error_message:
         print(f"get_metar_list() failed: {error_message}")
         write_error_log(error_message)
-        # 无论是否发生异常，都确保关闭浏览器
-        driver.quit()
         a = input('Press Enter to exit...')
-    
-    finally:
-        # 无论是否发生异常，都确保关闭浏览器
-        driver.quit()
  
  
 # 处理output.txt文件的函数
@@ -235,6 +206,9 @@ def get_output_result():
  
  
  
+ 
+ 
+ 
 if __name__ == '__main__':
     # 以下代码循环执行
     while True:
@@ -243,7 +217,6 @@ if __name__ == '__main__':
             os.system('cls')
             os.system('color a')
             print('沈阳桃仙机场METAR报文自动推送程序')
-            print(f'版本号: {version_code}')
             print('程序正在运行中，请稍候...')
             print('-' * 30)
             print('欢迎联系软件作者: 吴瀚庆')
@@ -471,7 +444,7 @@ if __name__ == '__main__':
  
  
                 metar_message = f'这是沈阳桃仙机场METAR报文的自动消息.\n来自{machine_info}\n\
-软件版权归属于 @雾岛听风WuHanqing\n版本号：{version_code}\n------------------------------\n\
+软件版权归属于 @雾岛听风WuHanqing\n------------------------------\n\
 机场代码: ZYTX\n------------------------------\n\
 当前METAR报文信息\n\
 日期: {result[0][0]}\n北京时间: {result[0][1]}\n预计使用跑道: {using_runway}\n\n飞行规则: {result[0][2]}\n\
