@@ -1,5 +1,6 @@
 # Automatic-ZYTX-METAR-Message-System
 It is a system that can get METAR messages of ZYTX airport and push the METAR message to Wechat through WXPusher.
+
 软件名称：沈阳桃仙机场METAR报文自动推送程序
 版本号：2024.07.28
 软件版权归属：吴瀚庆
@@ -36,4 +37,3 @@ It is a system that can get METAR messages of ZYTX airport and push the METAR me
 
 关于软件说明，就到此为止啦~
 欢迎提出宝贵意见，感谢支持！
-
